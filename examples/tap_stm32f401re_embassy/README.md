@@ -1,0 +1,88 @@
+# LIS2DUXS12 Tap Detection on STM32F401RE Nucleo-64 Using Embassy Framework
+
+This example demonstrates how to detect single, double, and triple tap gestures using the **LIS2DUXS12** accelerometer sensor on an **STM32F401RE** microcontroller board. The sensor is configured to generate interrupts on tap events, and the program outputs tap detection messages over UART.
+
+The project uses the [Embassy](https://embassy.dev/) framework for peripheral initialization and interrupt handling, leveraging its async runtime to efficiently wait for sensor interrupts. UART output is performed using blocking writes.
+
+---
+
+## Hardware Setup
+
+- **Microcontroller Board:** STM32F401RE Nucleo-64
+- **Sensor:** LIS2DUXS12 Accelerometer with tap detection capability
+- **Communication Interface:** I2C1 at 100 kHz Standard Mode
+- **UART:** USART2 for serial output at 115200 baud
+- **Interrupt Pin:** PB0 configured as input with external interrupt for tap events
+
+### Default Pin Configuration
+
+| Signal       | STM32F401RE Pin | Description                      |
+|--------------|-----------------|---------------------------------|
+| I2C1_SCL     | PB8             | I2C clock line (open-drain)     |
+| I2C1_SDA     | PB9             | I2C data line (open-drain)      |
+| USART2_TX    | PA2             | UART transmit for debug output  |
+| EXTI0 (INT)  | PB0             | External interrupt from tap events |
+
+The LIS2DUXS12 sensor is connected via I2C1 on PB8/PB9. The tap event interrupt line is connected to PB0, configured to trigger an external interrupt on rising edge. UART output is routed through PA2.
+
+---
+
+## Code Description
+
+### Initialization
+
+- The program initializes microcontroller peripherals including clocks, GPIO pins, I2C, UART, and a delay abstraction.
+- I2C1 is configured at 100 kHz Standard Mode on pins PB8 (SCL) and PB9 (SDA).
+- UART is configured on USART2 (PA2) at 115200 baud for serial output.
+- PB0 is configured as an input pin with interrupt on rising edge for tap event signaling.
+- The interrupt pin is wrapped in Embassy's async `ExtiInput` to await rising edges asynchronously.
+
+### Sensor Configuration
+
+- The LIS2DUXS12 sensor is initialized over I2C with the high I2C address.
+- The sensor is taken out of deep power down mode.
+- The device ID is read and verified; if mismatched, the program halts.
+- The sensor is reset to default configuration and waits until reset completes.
+- Embedded functions are enabled.
+- Tap detection is configured on the Z-axis with thresholds, timings, and enabling single, double, and triple tap detection.
+- Interrupt routing is configured to output tap events on INT1 pin (PB0).
+- Interrupt mode is set to level-triggered.
+- Output data rate is set to 400 Hz with ±8g full scale and low-pass filter.
+
+### Data Acquisition Loop
+
+- The main async task waits for rising edge interrupts on PB0 signaling tap events.
+- When an interrupt occurs, the program reads the sensor status.
+- It checks for single, double, and triple tap events and prints corresponding messages over UART.
+
+---
+
+## Usage
+
+1. Connect the LIS2DUXS12 sensor to the STM32F401RE Nucleo board via I2C1 (PB8/PB9).
+2. Connect the sensor's tap event interrupt output to PB0 on the STM32F401RE.
+3. Build and flash the firmware onto the STM32F401RE board.
+4. Open a serial terminal at 115200 baud on the USART2 TX line.
+5. Perform tap gestures on the sensor.
+6. Observe tap detection messages printed over UART.
+
+---
+
+## Notes
+
+- The example uses Embassy's async runtime to efficiently wait for GPIO interrupts.
+- UART output uses blocking writes without DMA.
+- The environment is `#![no_std]` and `#![no_main]` for embedded Rust applications.
+- Panic behavior is set to halt on panic using `defmt` and `panic_probe`.
+
+---
+
+## References
+
+- [STM32F401RE Nucleo-64 Board](https://www.st.com/en/evaluation-tools/nucleo-f401re.html)
+- [LIS2DUXS12 Datasheet](https://www.st.com/resource/en/datasheet/lis2duxs12.pdf)
+- [Embassy STM32 HAL](https://docs.rs/embassy-stm32)
+
+---
+
+*This README explains the embedded Rust program for tap detection on the LIS2DUXS12 sensor using STM32F401RE and the Embassy framework.*
