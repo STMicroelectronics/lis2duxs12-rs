@@ -13,10 +13,7 @@ embedded-hal = "1.0.0"
 libm = "0.2.14"
 panic-halt = "0.2.0"
 st-mems-bus = "1.0.0" 
-
-[dependencies.lis2duxs12-rs]
-path = "../../"
-default-features = false
+lis2duxs12-rs = "0.1.0"
 
 # Uncomment for the panic example.
 # panic-itm = "0.4.1"
