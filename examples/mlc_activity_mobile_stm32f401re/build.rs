@@ -17,9 +17,11 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 fn main() {
-    let input_file = Path::new("lis2duxs12_activity_recognition_for_mobile.ucf");
+    //Source file:
+    //https://github.com/STMicroelectronics/st-mems-machine-learning-core/blob/main/examples/activity_recognition_for_mobile/lis2duxs12/lis2duxs12_activity_recognition_for_mobile.json
+    let input_file = Path::new("lis2duxs12_activity_recognition_for_mobile.json");
     let output_file = Path::new("src/mlc_activity_recognition.rs");
-    parser::generate_rs_from_ucf(&input_file, &output_file, "ACTIVITY");
+    parser::generate_rs_from_json(&input_file, &output_file, "ACTIVITY", "LIS2DUXS12", false);
 
     // Put `memory.x` in our output directory and ensure it's
     // on the linker search path.
@@ -29,6 +31,7 @@ fn main() {
         .write_all(include_bytes!("memory.x"))
         .unwrap();
     println!("cargo:rustc-link-search={}", out.display());
+    println!("cargo:rerun-if-changed=lis2duxs12_activity_recognition_for_mobile.json");
 
     // By default, Cargo will re-run a build script whenever
     // any file in the project changes. By specifying `memory.x`
