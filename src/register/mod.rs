@@ -1,4 +1,4 @@
-use crate::{BusOperation, Error, Lis2duxs12, MemBankFunctions};
+use crate::{BusOperation, Error, MemBankFunctions, Lis2duxs12};
 use derive_more::TryFrom;
 use embedded_hal::delay::DelayNs;
 use st_mem_bank_macro::mem_bank;
